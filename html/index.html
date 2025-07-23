@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank UI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="login-container" class="login-container">
+        <div class="login-header">
+            <h2 id="login-bank-name">VISION BANK</h2>
+            <p data-locale="login_title"></p>
+        </div>
+        <div class="login-content">
+            <div id="pin-setup-view">
+                <p data-locale="login_desc_create"></p>
+                <div class="pin-input-container">
+                    <input type="password" id="pin-set-input" placeholder="••••" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                </div>
+                <button id="set-pin-btn" class="btn" data-locale="login_button_set"></button>
+            </div>
+            <div id="pin-login-view" style="display: none;">
+                <p data-locale="login_desc_enter"></p>
+                <div class="pin-input-container">
+                    <input type="password" id="pin-login-input" placeholder="••••" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,'');">
+                </div>
+                <button id="login-btn" class="btn" data-locale="login_button_login"></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="bank-container" class="bank-container">
+        <div id="loading-overlay" class="loading-overlay"><div class="loading-circle"></div></div>
+        <div id="notification-container"></div>
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-landmark icon"></i>
+                <h1 id="main-bank-name">VISION BANK</h1>
+            </div>
+            <div class="user-profile">
+                <div class="avatar"><i class="fas fa-user"></i></div>
+                <h2 id="profile-name"></h2>
+                <p id="profile-id"></p>
+            </div>
+            <ul class="navigation">
+                <li><a href="#" class="nav-link active" data-page="dashboard"><i class="fas fa-th-large"></i> <span data-locale="sidebar_dashboard"></span></a></li>
+                <li><a href="#" class="nav-link" data-page="transfer"><i class="fas fa-exchange-alt"></i> <span data-locale="sidebar_transfer"></span></a></li>
+                <li><a href="#" class="nav-link" data-page="history"><i class="fas fa-history"></i> <span data-locale="sidebar_history"></span></a></li>
+                <li><a href="#" class="nav-link" data-page="statistics"><i class="fas fa-chart-pie"></i> <span data-locale="sidebar_statistics"></span></a></li>
+                <li><a href="#" class="nav-link" data-page="deposit"><i class="fas fa-arrow-down"></i> <span data-locale="sidebar_deposit"></span></a></li>
+                <li><a href="#" class="nav-link" data-page="withdraw"><i class="fas fa-arrow-up"></i> <span data-locale="sidebar_withdraw"></span></a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="theme-switcher">
+                    <i class="fas fa-sun"></i>
+                    <label class="switch"><input type="checkbox" id="theme-toggle"><span class="slider round"></span></label>
+                    <i class="fas fa-moon"></i>
+                </div>
+                <button id="close-btn"><i class="fas fa-sign-out-alt"></i> <span data-locale="sidebar_logout"></span></button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div id="dashboard" class="page active">
+                <h2 class="page-title" data-locale="dashboard_title"></h2>
+                <div class="dashboard-layout">
+                    <div class="dashboard-main">
+                        <div class="account-summary-card">
+                            <div class="summary-info">
+                                <span class="label" data-locale="dashboard_balance"></span>
+                                <h3 id="dashboard-balance">$0</h3>
+                                <div class="summary-actions">
+                                    <button class="btn btn-sm btn-deposit" data-nav="deposit"><i class="fas fa-plus"></i> <span data-locale="sidebar_deposit"></span></button>
+                                    <button class="btn btn-sm btn-withdraw" data-nav="withdraw"><i class="fas fa-minus"></i> <span data-locale="sidebar_withdraw"></span></button>
+                                </div>
+                            </div>
+                            <div class="summary-chart">
+                                <canvas id="dashboard-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="recent-activity">
+                            <h3 data-locale="dashboard_recent_activity"></h3>
+                            <ul id="activity-list" class="activity-list"></ul>
+                        </div>
+                    </div>
+                    <div class="dashboard-side">
+                        <div class="credit-card">
+                            <div class="card-chip"></div>
+                            <h3 id="card-number" class="card-number">•••• •••• •••• ••••</h3>
+                            <div class="card-footer">
+                                <div><span data-locale="dashboard_card_holder"></span><strong id="card-holder"></strong></div>
+                                <div><span data-locale="dashboard_valid_thru"></span><strong>12/28</strong></div>
+                            </div>
+                        </div>
+                        <div class="account-details">
+                            <ul>
+                                <li><span data-locale="dashboard_acc_type"></span><span class="value">Premium</span></li>
+                                <li><span data-locale="dashboard_acc_number"></span><span id="acc-number" class="value"></span></li>
+                                <li><span data-locale="dashboard_acc_created"></span><span id="acc-created" class="value"></span></li>
+                                <li><span data-locale="dashboard_acc_status"></span><span id="acc-status" class="value active">Active</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="deposit" class="page">
+                 <h2 class="page-title" data-locale="deposit_title"></h2>
+                <div class="transaction-layout">
+                    <div class="transaction-form">
+                        <h3 data-locale="deposit_form_title"></h3>
+                        <p data-locale="deposit_form_desc"></p>
+                        <div class="form-group">
+                            <label for="deposit-amount" data-locale="deposit_form_label"></label>
+                            <input type="number" id="deposit-amount" placeholder="$ 0">
+                        </div>
+                        <button id="deposit-btn" class="btn btn-deposit" data-locale="deposit_form_button"></button>
+                    </div>
+                    <div class="transaction-sidebar">
+                        <div class="info-card">
+                            <h4 data-locale="sidebar_balance"></h4>
+                            <span id="deposit-balance" class="balance-display">$0</span>
+                        </div>
+                        <div class="info-card">
+                            <h4 data-locale="sidebar_quick_select"></h4>
+                            <div class="quick-amounts">
+                                <button class="btn-amount" data-target-input="#deposit-amount" data-amount="100">$100</button>
+                                <button class="btn-amount" data-target-input="#deposit-amount" data-amount="500">$500</button>
+                                <button class="btn-amount" data-target-input="#deposit-amount" data-amount="1000">$1000</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="withdraw" class="page">
+                <h2 class="page-title" data-locale="withdraw_title"></h2>
+                <div class="transaction-layout">
+                    <div class="transaction-form">
+                        <h3 data-locale="withdraw_form_title"></h3>
+                        <p data-locale="withdraw_form_desc"></p>
+                        <div class="form-group">
+                            <label for="withdraw-amount" data-locale="withdraw_form_label"></label>
+                            <input type="number" id="withdraw-amount" placeholder="$ 0">
+                        </div>
+                        <button id="withdraw-btn" class="btn btn-withdraw" data-locale="withdraw_form_button"></button>
+                    </div>
+                    <div class="transaction-sidebar">
+                        <div class="info-card">
+                            <h4 data-locale="sidebar_balance"></h4>
+                            <span id="withdraw-balance" class="balance-display">$0</span>
+                        </div>
+                        <div class="info-card">
+                            <h4 data-locale="sidebar_quick_select"></h4>
+                            <div class="quick-amounts">
+                                <button class="btn-amount" data-target-input="#withdraw-amount" data-amount="100">$100</button>
+                                <button class="btn-amount" data-target-input="#withdraw-amount" data-amount="500">$500</button>
+                                <button class="btn-amount" data-target-input="#withdraw-amount" data-amount="1000">$1000</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="transfer" class="page">
+                <h2 class="page-title" data-locale="transfer_title"></h2>
+                <div class="transaction-layout">
+                    <div class="transaction-form">
+                        <h3 data-locale="transfer_form_title"></h3>
+                        <p data-locale="transfer_form_desc"></p>
+                        <div class="form-group">
+                            <label for="transfer-id" data-locale="transfer_form_label_id"></label>
+                            <input type="number" id="transfer-id" placeholder="Contoh: 15">
+                        </div>
+                        <div class="form-group">
+                            <label for="transfer-amount" data-locale="transfer_form_label_amount"></label>
+                            <input type="number" id="transfer-amount" placeholder="$ 0">
+                        </div>
+                        <button id="transfer-btn" class="btn btn-transfer" data-locale="transfer_form_button"></button>
+                    </div>
+                    <div class="transaction-sidebar">
+                        <div class="info-card">
+                            <h4 data-locale="sidebar_balance"></h4>
+                            <span id="transfer-balance" class="balance-display">$0</span>
+                        </div>
+                         <div class="info-card">
+                            <h4 data-locale="sidebar_quick_select"></h4>
+                            <div class="quick-amounts">
+                                <button class="btn-amount" data-target-input="#transfer-amount" data-amount="100">$100</button>
+                                <button class="btn-amount" data-target-input="#transfer-amount" data-amount="500">$500</button>
+                                <button class="btn-amount" data-target-input="#transfer-amount" data-amount="1000">$1000</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="history" class="page">
+                <h2 class="page-title" data-locale="history_title"></h2>
+                <div class="history-table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th data-locale="history_col_date"></th>
+                                <th data-locale="history_col_desc"></th>
+                                <th data-locale="history_col_amount"></th>
+                                <th data-locale="history_col_balance"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body"></tbody>
+                    </table>
+                    <div id="history-no-data" class="no-data-message">
+                        <i class="fas fa-box-open"></i>
+                        <span data-locale="history_no_transactions"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="statistics" class="page">
+                <h2 class="page-title" data-locale="stats_title"></h2>
+                <div class="stats-layout">
+                    <div class="chart-container">
+                        <canvas id="stats-pie-chart"></canvas>
+                        <div id="stats-no-data" class="no-data-message">
+                            <i class="fas fa-chart-pie"></i>
+                            <span data-locale="history_no_transactions"></span>
+                        </div>
+                    </div>
+                    <div class="stats-summary">
+                        <div class="stat-item">
+                            <div>
+                                <span class="key" data-locale="stats_total_income"></span>
+                                <small data-locale="stats_based_on"></small>
+                            </div>
+                            <span id="stats-total-income" class="value income">$0</span>
+                        </div>
+                        <div class="stat-item">
+                            <div>
+                                <span class="key" data-locale="stats_total_expense"></span>
+                                <small data-locale="stats_based_on"></small>
+                            </div>
+                            <span id="stats-total-expense" class="value expense">$0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="key" data-locale="stats_net_change"></span>
+                            <span id="stats-net-change" class="value net">$0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
